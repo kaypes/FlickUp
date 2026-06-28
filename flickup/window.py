@@ -9,6 +9,7 @@ from gi.repository import Adw, GLib, GObject, Gio, Gtk
 
 from .converter import check_tools
 from .presenter import FlickUpPresenter
+from . import settings
 
 
 class FlickUpWindow(Adw.ApplicationWindow):
@@ -140,6 +141,12 @@ class FlickUpWindow(Adw.ApplicationWindow):
         self._row_format = Adw.ComboRow()
         self._row_format.set_title("Format")
         self._row_format.set_model(Gtk.StringList.new(self._formats))
+
+        last_fmt = settings.get_last_format()
+        if last_fmt in self._formats:
+            self._row_format.set_selected(self._formats.index(last_fmt))
+
+        self._row_format.connect("notify::selected", self._on_format_changed)
 
         group.add(self._row_output_name)
         group.add(self._row_format)
@@ -300,6 +307,9 @@ class FlickUpWindow(Adw.ApplicationWindow):
         except GLib.Error as e:
             if e.code not in (Gtk.DialogError.CANCELLED, Gtk.DialogError.DISMISSED):
                 self.show_toast(f"Error selecting folder: {e.message}")
+
+    def _on_format_changed(self, *_) -> None:
+        settings.save_last_format(self.selected_format)
 
     # ── Internal UI state helpers ─────────────────────────────────────────────
 
