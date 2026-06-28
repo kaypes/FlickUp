@@ -1,6 +1,11 @@
 # Temporary packaging directory
 pkg/
 
+# PyInstaller output
+dist/
+dist-pkg/
+build/
+
 # OAuth credentials and local config — never commit these
 credentials.json
 token.json
