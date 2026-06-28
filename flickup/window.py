@@ -59,7 +59,6 @@ class FlickUpWindow(Adw.ApplicationWindow):
     # ── Public UI update methods (called by presenter) ────────────────────────
 
     def begin_processing(self) -> None:
-        self._spinner.set_visible(True)
         self._group_progress.set_visible(True)
         self._set_ui_sensitive(False)
         self._pulse_source_id = GLib.timeout_add(80, self._pulse)
@@ -69,7 +68,6 @@ class FlickUpWindow(Adw.ApplicationWindow):
             GLib.source_remove(self._pulse_source_id)
             self._pulse_source_id = None
         self._progress_bar.set_text("Converting…")
-        self._spinner.set_visible(False)
         self._group_progress.set_visible(False)
         self._set_ui_sensitive(True)
 
@@ -92,9 +90,6 @@ class FlickUpWindow(Adw.ApplicationWindow):
         self.set_content(self._toast_overlay)
 
         self._header_bar = Adw.HeaderBar()
-        self._spinner = Adw.Spinner()
-        self._spinner.set_visible(False)
-        self._header_bar.pack_end(self._spinner)
         self._toolbar_view.add_top_bar(self._header_bar)
 
         self._banner = Adw.Banner()
@@ -207,11 +202,7 @@ class FlickUpWindow(Adw.ApplicationWindow):
             "clicked", lambda _: self._presenter.on_convert_clicked()
         )
 
-        row = Adw.ActionRow()
-        row.set_title("")
-        row.add_suffix(self._btn_convert)
-        row.set_activatable_widget(self._btn_convert)
-        group.add(row)
+        group.add(self._btn_convert)
         self._page.add(group)
 
     def _build_progress_group(self) -> None:
