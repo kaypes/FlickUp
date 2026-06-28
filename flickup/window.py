@@ -17,7 +17,8 @@ class FlickUpWindow(Adw.ApplicationWindow):
         super().__init__(**kwargs)
 
         self._input_file: str | None = None
-        self._local_folder: str | None = None
+        _videos = Path(GLib.get_home_dir()) / "Videos"
+        self._local_folder: str = str(_videos)
         self._formats = [".mov", ".mp4", ".mkv", ".avi"]
         self._pulse_source_id: int | None = None
 
@@ -112,7 +113,7 @@ class FlickUpWindow(Adw.ApplicationWindow):
 
         self._row_local_folder = Adw.ActionRow()
         self._row_local_folder.set_title("Output Folder")
-        self._row_local_folder.set_subtitle("No folder selected")
+        self._row_local_folder.set_subtitle(self._local_folder)
 
         btn = Gtk.Button(label="Browse")
         btn.add_css_class("flat")
@@ -266,7 +267,7 @@ class FlickUpWindow(Adw.ApplicationWindow):
                 return "rclone path must include a remote name (e.g. remote:folder)."
         else:
             if not self._local_folder:
-                return "Please select an output folder."
+                return "Please select an output folder."  # unreachable with default
         return None
 
     # ── Conversion ────────────────────────────────────────────────────────────
@@ -285,6 +286,7 @@ class FlickUpWindow(Adw.ApplicationWindow):
             output_dir = tempfile.mkdtemp(prefix="flickup_")
         else:
             output_dir = self._local_folder
+            Path(output_dir).mkdir(parents=True, exist_ok=True)
 
         output_file = str(Path(output_dir) / (output_name + fmt))
         rclone_path = self._row_rclone_path.get_text().strip() if send_to_drive else ""
