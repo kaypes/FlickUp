@@ -12,10 +12,14 @@ from googleapiclient.http import MediaFileUpload
 _SCOPES = ["https://www.googleapis.com/auth/drive.file"]
 
 _CREDENTIALS = Path(
-    os.environ.get("FLICKUP_CREDENTIALS", Path(__file__).parent.parent / "credentials.json")
+    os.environ.get(
+        "FLICKUP_CREDENTIALS", Path(__file__).parent.parent / "credentials.json"
+    )
 )
 _TOKEN = Path(
-    os.environ.get("FLICKUP_TOKEN", Path(GLib.get_user_config_dir()) / "flickup" / "token.json")
+    os.environ.get(
+        "FLICKUP_TOKEN", Path(GLib.get_user_config_dir()) / "flickup" / "token.json"
+    )
 )
 
 
@@ -66,8 +70,9 @@ def upload_sync(file_path: str, folder_name: str) -> None:
     creds = _get_credentials()
     service = build("drive", "v3", credentials=creds)
 
-    folder_id = _find_or_create_folder(service, folder_name)
-
     media = MediaFileUpload(file_path, resumable=True)
-    metadata = {"name": Path(file_path).name, "parents": [folder_id]}
+    metadata = {"name": Path(file_path).name}
+    if folder_name:
+        metadata["parents"] = [_find_or_create_folder(service, folder_name)]
+
     service.files().create(body=metadata, media_body=media, fields="id").execute()

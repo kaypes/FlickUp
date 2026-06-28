@@ -39,8 +39,6 @@ class FlickUpPresenter:
             return _("Please select an input file.")
         if not w.output_name:
             return _("Please enter an output filename.")
-        if w.send_to_drive and not w.drive_folder:
-            return _("Please enter a Drive folder name.")
         return None
 
     def _build_job(self) -> ConversionJob:
