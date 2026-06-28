@@ -146,7 +146,8 @@ class FlickUpWindow(Adw.ApplicationWindow):
 
         self._row_send_to_drive = Adw.SwitchRow()
         self._row_send_to_drive.set_title(_("Send to Drive"))
-        self._row_send_to_drive.set_subtitle(_("Upload via rclone after conversion"))
+        self._row_send_to_drive.set_subtitle(_("Upload to Drive after conversion"))
+        self._row_send_to_drive.set_active(settings.get_send_to_drive())
 
         group.add(self._row_send_to_drive)
         self._page.add(group)
@@ -171,12 +172,11 @@ class FlickUpWindow(Adw.ApplicationWindow):
 
     def _build_drive_group(self) -> None:
         self._group_drive = Adw.PreferencesGroup()
-        self._group_drive.set_title(_("rclone Destination"))
-        self._group_drive.set_description(_('Example: "remote:MyFolder"'))
+        self._group_drive.set_title(_("Drive Destination"))
         self._group_drive.set_visible(False)
 
         self._row_rclone_path = Adw.EntryRow()
-        self._row_rclone_path.set_title(_("rclone Path"))
+        self._row_rclone_path.set_title(_("Destination Path"))
         self._row_rclone_path.set_show_apply_button(False)
 
         self._group_drive.add(self._row_rclone_path)
@@ -223,7 +223,7 @@ class FlickUpWindow(Adw.ApplicationWindow):
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.INVERT_BOOLEAN,
         )
         self._row_send_to_drive.connect(
-            "notify::active", lambda *_: self._check_tools()
+            "notify::active", self._on_send_to_drive_changed
         )
 
     # ── Tool availability warning ─────────────────────────────────────────────
@@ -291,6 +291,10 @@ class FlickUpWindow(Adw.ApplicationWindow):
                 self.show_toast(
                     _("Error selecting folder: {msg}").format(msg=e.message)
                 )
+
+    def _on_send_to_drive_changed(self, *_) -> None:
+        settings.save_send_to_drive(self._row_send_to_drive.get_active())
+        self._check_tools()
 
     def _on_format_changed(self, *_) -> None:
         settings.save_last_format(self.selected_format)

@@ -41,9 +41,9 @@ class FlickUpPresenter:
             return _("Please enter an output filename.")
         if w.send_to_drive:
             if not w.rclone_path:
-                return _("Please enter an rclone path (e.g. remote:folder).")
+                return _("Please enter a Drive destination path.")
             if ":" not in w.rclone_path:
-                return _("rclone path must include a remote name (e.g. remote:folder).")
+                return _("Drive destination path is invalid.")
         return None
 
     def _build_job(self) -> ConversionJob:

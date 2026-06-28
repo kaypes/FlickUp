@@ -4,7 +4,7 @@ from pathlib import Path
 from gi.repository import GLib
 
 _CONFIG_FILE = Path(GLib.get_user_config_dir()) / "flickup" / "settings.json"
-_DEFAULTS: dict = {"last_format": ".mov"}
+_DEFAULTS: dict = {"last_format": ".mov", "send_to_drive": False}
 
 
 def _load() -> dict:
@@ -26,4 +26,14 @@ def get_last_format() -> str:
 def save_last_format(fmt: str) -> None:
     data = _load()
     data["last_format"] = fmt
+    _save(data)
+
+
+def get_send_to_drive() -> bool:
+    return bool(_load()["send_to_drive"])
+
+
+def save_send_to_drive(value: bool) -> None:
+    data = _load()
+    data["send_to_drive"] = value
     _save(data)
