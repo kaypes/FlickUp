@@ -149,6 +149,9 @@ msgstr "Enviando…"
 msgid "Conversion complete!"
 msgstr "Conversão concluída!"
 
+msgid "Upload complete!"
+msgstr "Envio concluído!"
+
 #: src/presenter.py:97
 msgid "Unknown error"
 msgstr "Erro desconhecido"

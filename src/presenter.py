@@ -79,7 +79,9 @@ class Presenter:
 
         output = Path(job.output_file)
         if not output.exists() or output.stat().st_size == 0:
-            GLib.idle_add(self._on_done, False, _("Conversion produced no output file."))
+            GLib.idle_add(
+                self._on_done, False, _("Conversion produced no output file.")
+            )
             return
 
         if job.send_to_drive:
@@ -90,13 +92,14 @@ class Presenter:
                 GLib.idle_add(self._on_done, False, str(e))
                 return
 
-        GLib.idle_add(self._on_done, True, None)
+        msg = _("Upload complete!") if job.send_to_drive else _("Conversion complete!")
+        GLib.idle_add(self._on_done, True, None, msg)
 
-    def _on_done(self, success: bool, error: str | None) -> bool:
+    def _on_done(self, success: bool, error: str | None, success_msg: str = "") -> bool:
         self._processing = False
         self._window.end_processing()
         if success:
-            self._window.show_toast(_("Conversion complete!"))
+            self._window.show_toast(success_msg)
         else:
             msg = (error or _("Unknown error"))[:200]
             self._window.show_toast(_("Error: {msg}").format(msg=msg), high=True)
