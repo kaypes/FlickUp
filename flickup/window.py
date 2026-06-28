@@ -1,5 +1,3 @@
-import tempfile
-import threading
 from pathlib import Path
 
 import gi
@@ -9,18 +7,20 @@ gi.require_version("Adw", "1")
 
 from gi.repository import Adw, GLib, GObject, Gio, Gtk
 
-from .converter import ConversionJob, check_tools, run_conversion
+from .converter import check_tools
+from .presenter import FlickUpPresenter
 
 
 class FlickUpWindow(Adw.ApplicationWindow):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
-        self._input_file: str | None = None
         _videos = GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_VIDEOS)
+        self._input_file: str | None = None
         self._local_folder: str = _videos or str(Path(GLib.get_home_dir()) / "Videos")
         self._formats = [".mov", ".mp4", ".mkv", ".avi"]
         self._pulse_source_id: int | None = None
+        self._presenter = FlickUpPresenter(self)
 
         self.set_title("FlickUp")
         self.set_default_size(600, -1)
@@ -29,7 +29,60 @@ class FlickUpWindow(Adw.ApplicationWindow):
         self._setup_bindings()
         self._check_tools()
 
-    # ── UI construction ─────────────────────────────────────────────────────
+    # ── Form value properties (read by presenter) ─────────────────────────────
+
+    @property
+    def input_file(self) -> str | None:
+        return self._input_file
+
+    @property
+    def output_name(self) -> str:
+        return self._row_output_name.get_text().strip()
+
+    @property
+    def selected_format(self) -> str:
+        return self._formats[self._row_format.get_selected()]
+
+    @property
+    def send_to_drive(self) -> bool:
+        return self._row_send_to_drive.get_active()
+
+    @property
+    def local_folder(self) -> str:
+        return self._local_folder
+
+    @property
+    def rclone_path(self) -> str:
+        return self._row_rclone_path.get_text().strip()
+
+    # ── Public UI update methods (called by presenter) ────────────────────────
+
+    def begin_processing(self) -> None:
+        self._spinner.set_visible(True)
+        self._group_progress.set_visible(True)
+        self._set_ui_sensitive(False)
+        self._pulse_source_id = GLib.timeout_add(80, self._pulse)
+
+    def end_processing(self) -> None:
+        if self._pulse_source_id is not None:
+            GLib.source_remove(self._pulse_source_id)
+            self._pulse_source_id = None
+        self._progress_bar.set_text("Converting…")
+        self._spinner.set_visible(False)
+        self._group_progress.set_visible(False)
+        self._set_ui_sensitive(True)
+
+    def set_progress_text(self, text: str) -> None:
+        self._progress_bar.set_text(text)
+
+    def show_toast(self, message: str, *, high: bool = False) -> None:
+        toast = Adw.Toast.new(message)
+        toast.set_timeout(4)
+        if high:
+            toast.set_priority(Adw.ToastPriority.HIGH)
+        self._toast_overlay.add_toast(toast)
+
+    # ── UI construction ───────────────────────────────────────────────────────
 
     def _build_ui(self) -> None:
         self._toast_overlay = Adw.ToastOverlay()
@@ -37,19 +90,16 @@ class FlickUpWindow(Adw.ApplicationWindow):
         self._toast_overlay.set_child(self._toolbar_view)
         self.set_content(self._toast_overlay)
 
-        # Header bar
         self._header_bar = Adw.HeaderBar()
         self._spinner = Adw.Spinner()
         self._spinner.set_visible(False)
         self._header_bar.pack_end(self._spinner)
         self._toolbar_view.add_top_bar(self._header_bar)
 
-        # Banner (tool warnings)
         self._banner = Adw.Banner()
         self._banner.set_revealed(False)
         self._toolbar_view.add_top_bar(self._banner)
 
-        # Preferences page (handles scroll + clamp internally)
         self._page = Adw.PreferencesPage()
         self._toolbar_view.set_content(self._page)
 
@@ -69,14 +119,13 @@ class FlickUpWindow(Adw.ApplicationWindow):
         self._row_input.set_title("Input File")
         self._row_input.set_subtitle("No file selected")
 
-        btn = Gtk.Button(label="Browse")
-        btn.add_css_class("flat")
-        btn.set_valign(Gtk.Align.CENTER)
-        btn.connect("clicked", self._on_browse_input)
-        self._btn_browse_input = btn
+        self._btn_browse_input = Gtk.Button(label="Browse")
+        self._btn_browse_input.add_css_class("flat")
+        self._btn_browse_input.set_valign(Gtk.Align.CENTER)
+        self._btn_browse_input.connect("clicked", self._on_browse_input)
 
-        self._row_input.add_suffix(btn)
-        self._row_input.set_activatable_widget(btn)
+        self._row_input.add_suffix(self._btn_browse_input)
+        self._row_input.set_activatable_widget(self._btn_browse_input)
         group.add(self._row_input)
         self._page.add(group)
 
@@ -115,14 +164,13 @@ class FlickUpWindow(Adw.ApplicationWindow):
         self._row_local_folder.set_title("Output Folder")
         self._row_local_folder.set_subtitle(self._local_folder)
 
-        btn = Gtk.Button(label="Browse")
-        btn.add_css_class("flat")
-        btn.set_valign(Gtk.Align.CENTER)
-        btn.connect("clicked", self._on_browse_folder)
-        self._btn_browse_folder = btn
+        self._btn_browse_folder = Gtk.Button(label="Browse")
+        self._btn_browse_folder.add_css_class("flat")
+        self._btn_browse_folder.set_valign(Gtk.Align.CENTER)
+        self._btn_browse_folder.connect("clicked", self._on_browse_folder)
 
-        self._row_local_folder.add_suffix(btn)
-        self._row_local_folder.set_activatable_widget(btn)
+        self._row_local_folder.add_suffix(self._btn_browse_folder)
+        self._row_local_folder.set_activatable_widget(self._btn_browse_folder)
         self._group_local.add(self._row_local_folder)
         self._page.add(self._group_local)
 
@@ -148,7 +196,9 @@ class FlickUpWindow(Adw.ApplicationWindow):
         self._btn_convert.set_hexpand(True)
         self._btn_convert.set_margin_top(8)
         self._btn_convert.set_margin_bottom(8)
-        self._btn_convert.connect("clicked", self._on_convert_clicked)
+        self._btn_convert.connect(
+            "clicked", lambda _: self._presenter.on_convert_clicked()
+        )
 
         row = Adw.ActionRow()
         row.set_title("")
@@ -171,7 +221,7 @@ class FlickUpWindow(Adw.ApplicationWindow):
         self._group_progress.add(self._progress_bar)
         self._page.add(self._group_progress)
 
-    # ── Bindings ─────────────────────────────────────────────────────────────
+    # ── Bindings ──────────────────────────────────────────────────────────────
 
     def _setup_bindings(self) -> None:
         self._row_send_to_drive.bind_property(
@@ -190,7 +240,7 @@ class FlickUpWindow(Adw.ApplicationWindow):
             "notify::active", lambda *_: self._check_tools()
         )
 
-    # ── Tool availability ─────────────────────────────────────────────────────
+    # ── Tool availability warning ─────────────────────────────────────────────
 
     def _check_tools(self) -> None:
         missing = check_tools(self._row_send_to_drive.get_active())
@@ -203,12 +253,9 @@ class FlickUpWindow(Adw.ApplicationWindow):
         else:
             self._banner.set_revealed(False)
 
-    # ── File / folder pickers ─────────────────────────────────────────────────
+    # ── File / folder dialogs ─────────────────────────────────────────────────
 
     def _on_browse_input(self, _button) -> None:
-        dialog = Gtk.FileDialog.new()
-        dialog.set_title("Select Input Video")
-
         video_filter = Gtk.FileFilter()
         video_filter.set_name("Video files")
         video_filter.add_mime_type("video/*")
@@ -220,10 +267,12 @@ class FlickUpWindow(Adw.ApplicationWindow):
         filters = Gio.ListStore.new(Gtk.FileFilter)
         filters.append(video_filter)
         filters.append(all_filter)
+
+        dialog = Gtk.FileDialog.new()
+        dialog.set_title("Select Input Video")
         dialog.set_filters(filters)
         dialog.set_default_filter(video_filter)
         dialog.set_initial_folder(Gio.File.new_for_path(GLib.get_home_dir()))
-
         dialog.open(self, None, self._on_input_file_chosen)
 
     def _on_input_file_chosen(self, dialog, result) -> None:
@@ -234,7 +283,7 @@ class FlickUpWindow(Adw.ApplicationWindow):
                 self._row_input.set_subtitle(file.get_basename())
         except GLib.Error as e:
             if e.code not in (Gtk.DialogError.CANCELLED, Gtk.DialogError.DISMISSED):
-                self._show_toast(f"Error opening file: {e.message}")
+                self.show_toast(f"Error opening file: {e.message}")
 
     def _on_browse_folder(self, _button) -> None:
         dialog = Gtk.FileDialog.new()
@@ -250,101 +299,19 @@ class FlickUpWindow(Adw.ApplicationWindow):
                 self._row_local_folder.set_subtitle(self._local_folder)
         except GLib.Error as e:
             if e.code not in (Gtk.DialogError.CANCELLED, Gtk.DialogError.DISMISSED):
-                self._show_toast(f"Error selecting folder: {e.message}")
+                self.show_toast(f"Error selecting folder: {e.message}")
 
-    # ── Validation ────────────────────────────────────────────────────────────
+    # ── Internal UI state helpers ─────────────────────────────────────────────
 
-    def _validate(self) -> str | None:
-        if not self._input_file:
-            return "Please select an input file."
-        if not self._row_output_name.get_text().strip():
-            return "Please enter an output filename."
-        if self._row_send_to_drive.get_active():
-            path = self._row_rclone_path.get_text().strip()
-            if not path:
-                return "Please enter an rclone path (e.g. remote:folder)."
-            if ":" not in path:
-                return "rclone path must include a remote name (e.g. remote:folder)."
-        else:
-            if not self._local_folder:
-                return "Please select an output folder."  # unreachable with default
-        return None
-
-    # ── Conversion ────────────────────────────────────────────────────────────
-
-    def _on_convert_clicked(self, _button) -> None:
-        error = self._validate()
-        if error:
-            self._show_toast(error)
-            return
-
-        output_name = self._row_output_name.get_text().strip()
-        fmt = self._formats[self._row_format.get_selected()]
-        send_to_drive = self._row_send_to_drive.get_active()
-
-        if send_to_drive:
-            output_dir = tempfile.mkdtemp(prefix="flickup_")
-        else:
-            output_dir = self._local_folder
-            Path(output_dir).mkdir(parents=True, exist_ok=True)
-
-        output_file = str(Path(output_dir) / (output_name + fmt))
-        rclone_path = self._row_rclone_path.get_text().strip() if send_to_drive else ""
-
-        job = ConversionJob(
-            input_file=self._input_file,
-            output_file=output_file,
-            send_to_drive=send_to_drive,
-            rclone_path=rclone_path,
-        )
-
-        self._set_processing(True)
-        threading.Thread(
-            target=run_conversion,
-            args=(job, self._on_progress, self._on_done),
-            daemon=True,
-        ).start()
-
-    def _set_processing(self, processing: bool) -> None:
-        self._spinner.set_visible(processing)
-        self._group_progress.set_visible(processing)
-        self._btn_convert.set_sensitive(not processing)
-        self._btn_browse_input.set_sensitive(not processing)
-        self._btn_browse_folder.set_sensitive(not processing)
-        self._row_output_name.set_sensitive(not processing)
-        self._row_format.set_sensitive(not processing)
-        self._row_send_to_drive.set_sensitive(not processing)
-        self._row_rclone_path.set_sensitive(not processing)
-
-        if processing:
-            self._pulse_source_id = GLib.timeout_add(80, self._pulse)
-        elif self._pulse_source_id is not None:
-            GLib.source_remove(self._pulse_source_id)
-            self._pulse_source_id = None
+    def _set_ui_sensitive(self, sensitive: bool) -> None:
+        self._btn_convert.set_sensitive(sensitive)
+        self._btn_browse_input.set_sensitive(sensitive)
+        self._btn_browse_folder.set_sensitive(sensitive)
+        self._row_output_name.set_sensitive(sensitive)
+        self._row_format.set_sensitive(sensitive)
+        self._row_send_to_drive.set_sensitive(sensitive)
+        self._row_rclone_path.set_sensitive(sensitive)
 
     def _pulse(self) -> bool:
         self._progress_bar.pulse()
         return GLib.SOURCE_CONTINUE
-
-    def _on_progress(self) -> bool:
-        self._progress_bar.set_text("Uploading to Drive…")
-        return GLib.SOURCE_REMOVE
-
-    def _on_done(self, success: bool, error: str | None) -> bool:
-        self._progress_bar.set_text("Converting…")
-        self._set_processing(False)
-        if success:
-            self._show_toast("Conversion complete!")
-        else:
-            msg = (error or "Unknown error")[:200]
-            self._show_toast(f"Error: {msg}", high=True)
-        return GLib.SOURCE_REMOVE
-
-    # ── Toast helper ──────────────────────────────────────────────────────────
-
-    def _show_toast(self, message: str, *, high: bool = False) -> None:
-        toast = Adw.Toast.new(message)
-        toast.set_timeout(4)
-        if high:
-            toast.set_priority(Adw.ToastPriority.HIGH)
-        self._toast_overlay.add_toast(toast)

@@ -1,0 +1,72 @@
+import tempfile
+import threading
+from pathlib import Path
+
+from .converter import ConversionJob, run_conversion
+
+
+class FlickUpPresenter:
+    def __init__(self, window) -> None:
+        self._window = window
+
+    # ── Public ────────────────────────────────────────────────────────────────
+
+    def on_convert_clicked(self) -> None:
+        error = self._validate()
+        if error:
+            self._window.show_toast(error)
+            return
+
+        job = self._build_job()
+        self._window.begin_processing()
+        threading.Thread(
+            target=run_conversion,
+            args=(job, self._on_progress, self._on_done),
+            daemon=True,
+        ).start()
+
+    # ── Private ───────────────────────────────────────────────────────────────
+
+    def _validate(self) -> str | None:
+        w = self._window
+        if not w.input_file:
+            return "Please select an input file."
+        if not w.output_name:
+            return "Please enter an output filename."
+        if w.send_to_drive:
+            if not w.rclone_path:
+                return "Please enter an rclone path (e.g. remote:folder)."
+            if ":" not in w.rclone_path:
+                return "rclone path must include a remote name (e.g. remote:folder)."
+        return None
+
+    def _build_job(self) -> ConversionJob:
+        w = self._window
+        if w.send_to_drive:
+            output_dir = tempfile.mkdtemp(prefix="flickup_")
+        else:
+            output_dir = w.local_folder
+            Path(output_dir).mkdir(parents=True, exist_ok=True)
+
+        output_file = str(Path(output_dir) / (w.output_name + w.selected_format))
+        return ConversionJob(
+            input_file=w.input_file,
+            output_file=output_file,
+            send_to_drive=w.send_to_drive,
+            rclone_path=w.rclone_path if w.send_to_drive else "",
+        )
+
+    # Callbacks are dispatched to the main thread by GLib.idle_add in converter.py
+
+    def _on_progress(self) -> bool:
+        self._window.set_progress_text("Uploading to Drive…")
+        return False
+
+    def _on_done(self, success: bool, error: str | None) -> bool:
+        self._window.end_processing()
+        if success:
+            self._window.show_toast("Conversion complete!")
+        else:
+            msg = (error or "Unknown error")[:200]
+            self._window.show_toast(f"Error: {msg}", high=True)
+        return False
