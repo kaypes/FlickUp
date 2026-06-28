@@ -81,6 +81,7 @@ class FlickUpPresenter:
             return
 
         if job.send_to_drive:
+            GLib.idle_add(self._window.set_processing_label, _("Uploading…"))
             try:
                 drive.upload_sync(job.output_file, job.drive_folder)
             except Exception as e:

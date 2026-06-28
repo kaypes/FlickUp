@@ -63,6 +63,10 @@ class FlickUpWindow(Adw.ApplicationWindow):
         self._btn_label.set_label(_("Converting…"))
         self._set_ui_sensitive(False)
 
+    def set_processing_label(self, text: str) -> bool:
+        self._btn_label.set_label(text)
+        return False
+
     def end_processing(self) -> None:
         self._btn_spinner.set_visible(False)
         self._btn_label.set_label(_("Convert"))

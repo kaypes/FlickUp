@@ -1,102 +1,145 @@
 # Portuguese (Brazil) translation for FlickUp.
 msgid ""
 msgstr ""
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-06-28 14:43-0300\n"
+"Language: pt_BR\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: pt_BR\n"
 
+#: src/window.py:63
 msgid "Converting…"
 msgstr "Convertendo…"
 
+#: src/window.py:72 src/window.py:202
 msgid "Convert"
 msgstr "Converter"
 
+#: src/window.py:109
 msgid "Source"
 msgstr "Origem"
 
+#: src/window.py:112
 msgid "Input File"
 msgstr "Arquivo de entrada"
 
+#: src/window.py:113
 msgid "No file selected"
 msgstr "Nenhum arquivo selecionado"
 
+#: src/window.py:115 src/window.py:167
 msgid "Browse"
 msgstr "Escolher"
 
+#: src/window.py:127
 msgid "Output"
 msgstr "Saída"
 
+#: src/window.py:130
 msgid "Output Filename"
 msgstr "Nome do arquivo de saída"
 
+#: src/window.py:134
 msgid "Format"
 msgstr "Formato"
 
+#: src/window.py:149
 msgid "Destination"
 msgstr "Destino"
 
+#: src/window.py:152
 msgid "Send to Drive"
 msgstr "Enviar para o Drive"
 
+#: src/window.py:153
 msgid "Upload to Drive after conversion"
 msgstr "Enviar para o Drive após a conversão"
 
+#: src/window.py:161
 msgid "Local Destination"
 msgstr "Destino local"
 
+#: src/window.py:164
 msgid "Output Folder"
 msgstr "Pasta de saída"
 
+#: src/window.py:179
 msgid "Drive Destination"
 msgstr "Destino no Drive"
 
+#: src/window.py:181
 msgid "Enter the destination folder name on your Google Drive"
 msgstr "Digite o nome da pasta de destino no seu Google Drive"
 
+#: src/window.py:186
 msgid "Folder Name"
 msgstr "Nome da pasta"
 
+#: src/window.py:243
+#, python-brace-format
 msgid "{names} is not installed. Please install it to use FlickUp."
 msgstr "{names} não está instalado. Instale para usar o FlickUp."
 
+#: src/window.py:255
 msgid "Video files"
 msgstr "Arquivos de vídeo"
 
+#: src/window.py:259
 msgid "All files"
 msgstr "Todos os arquivos"
 
+#: src/window.py:267
 msgid "Select Input Video"
 msgstr "Selecionar vídeo de entrada"
 
+#: src/window.py:282
+#, python-brace-format
 msgid "Error opening file: {msg}"
 msgstr "Erro ao abrir arquivo: {msg}"
 
+#: src/window.py:286
 msgid "Select Output Folder"
 msgstr "Selecionar pasta de saída"
 
+#: src/window.py:299
+#, python-brace-format
 msgid "Error selecting folder: {msg}"
 msgstr "Erro ao selecionar pasta: {msg}"
 
+#: src/presenter.py:39
 msgid "Please select an input file."
 msgstr "Selecione um arquivo de entrada."
 
+#: src/presenter.py:41
 msgid "Please enter an output filename."
 msgstr "Digite o nome do arquivo de saída."
 
+#: src/presenter.py:43
 msgid "Please enter a Drive folder name."
 msgstr "Digite o nome da pasta no Drive."
 
-msgid "Conversion complete!"
-msgstr "Conversão concluída!"
-
-msgid "Unknown error"
-msgstr "Erro desconhecido"
-
-msgid "Error: {msg}"
-msgstr "Erro: {msg}"
-
+#: src/presenter.py:79 src/converter.py:42
 msgid "ffmpeg failed with no output."
 msgstr "O ffmpeg falhou sem mensagem de erro."
 
+#: src/presenter.py:84
+msgid "Uploading…"
+msgstr "Enviando…"
+
+#: src/presenter.py:97
+msgid "Conversion complete!"
+msgstr "Conversão concluída!"
+
+#: src/presenter.py:99
+msgid "Unknown error"
+msgstr "Erro desconhecido"
+
+#: src/presenter.py:100
+#, python-brace-format
+msgid "Error: {msg}"
+msgstr "Erro: {msg}"
+
+#: src/drive.py:35
 msgid "credentials.json not found. Please set up Google Drive credentials."
-msgstr "credentials.json não encontrado. Configure as credenciais do Google Drive."
+msgstr ""
+"credentials.json não encontrado. Configure as credenciais do Google Drive."
