@@ -173,7 +173,9 @@ class FlickUpWindow(Adw.ApplicationWindow):
     def _build_drive_group(self) -> None:
         self._group_drive = Adw.PreferencesGroup()
         self._group_drive.set_title(_("Drive Destination"))
-        self._group_drive.set_description(_("Enter the destination folder name on your Google Drive"))
+        self._group_drive.set_description(
+            _("Enter the destination folder name on your Google Drive")
+        )
         self._group_drive.set_visible(False)
 
         self._row_drive_folder = Adw.EntryRow()
