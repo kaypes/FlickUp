@@ -38,8 +38,7 @@ class FlickUpWindow(Adw.ApplicationWindow):
 
     @property
     def output_name(self) -> str:
-        text = self._row_output_name.get_text().strip()
-        return text or (self._row_output_name.get_placeholder_text() or "")
+        return self._row_output_name.get_text().strip()
 
     @property
     def selected_format(self) -> str:
@@ -280,8 +279,7 @@ class FlickUpWindow(Adw.ApplicationWindow):
             if file:
                 self._input_file = file.get_path()
                 self._row_input.set_subtitle(file.get_basename())
-                self._row_output_name.set_text("")
-                self._row_output_name.set_placeholder_text(Path(self._input_file).stem)
+                self._row_output_name.set_text(Path(self._input_file).stem)
         except GLib.Error as e:
             if e.code not in (Gtk.DialogError.CANCELLED, Gtk.DialogError.DISMISSED):
                 self.show_toast(f"Error opening file: {e.message}")
