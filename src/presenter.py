@@ -77,6 +77,11 @@ class Presenter:
             GLib.idle_add(self._on_done, False, error)
             return
 
+        output = Path(job.output_file)
+        if not output.exists() or output.stat().st_size == 0:
+            GLib.idle_add(self._on_done, False, _("Conversion produced no output file."))
+            return
+
         if job.send_to_drive:
             GLib.idle_add(self._window.set_processing_label, _("Uploading…"))
             try:

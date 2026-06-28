@@ -138,6 +138,9 @@ msgstr "Digite o nome do arquivo de saída."
 msgid "ffmpeg failed with no output."
 msgstr "O ffmpeg falhou sem mensagem de erro."
 
+msgid "Conversion produced no output file."
+msgstr "A conversão não gerou nenhum arquivo de saída."
+
 #: src/presenter.py:82
 msgid "Uploading…"
 msgstr "Enviando…"
