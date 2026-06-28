@@ -1,3 +1,4 @@
+import mimetypes
 import os
 from gettext import gettext as _
 from pathlib import Path
@@ -66,7 +67,12 @@ def upload_sync(file_path: str, folder_name: str) -> None:
     creds = _get_credentials()
     service = build("drive", "v3", credentials=creds)
 
-    media = MediaFileUpload(file_path, resumable=True)
+    mime_type, _ = mimetypes.guess_type(file_path)
+    media = MediaFileUpload(
+        file_path,
+        mimetype=mime_type or "application/octet-stream",
+        resumable=True,
+    )
     metadata = {"name": Path(file_path).name}
     if folder_name:
         metadata["parents"] = [_find_or_create_folder(service, folder_name)]
