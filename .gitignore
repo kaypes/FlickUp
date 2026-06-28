@@ -1,6 +1,7 @@
-# OAuth credentials — never commit these
+# OAuth credentials and local config — never commit these
 credentials.json
 token.json
+.env
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
