@@ -22,6 +22,7 @@ class FlickUpWindow(Adw.ApplicationWindow):
         self._local_folder: str = _videos or str(Path(GLib.get_home_dir()) / "Videos")
         self._formats = [".mov", ".mp4", ".mkv", ".avi"]
         self._is_processing = False
+        self._is_uploading = False
         self._presenter = FlickUpPresenter(self)
 
         self.set_title("FlickUp")
@@ -67,11 +68,13 @@ class FlickUpWindow(Adw.ApplicationWindow):
         self._set_ui_sensitive(False)
 
     def set_processing_label(self, text: str) -> bool:
+        self._is_uploading = True
         self._btn_label.set_label(text)
         return False
 
     def end_processing(self) -> None:
         self._is_processing = False
+        self._is_uploading = False
         self._btn_spinner.set_visible(False)
         self._btn_label.set_label(_("Convert"))
         self._set_ui_sensitive(True)
@@ -314,10 +317,12 @@ class FlickUpWindow(Adw.ApplicationWindow):
         if not self._is_processing:
             return False
 
-        dialog = Adw.AlertDialog.new(
-            _("Cancel operation?"),
-            _("A conversion is in progress. Closing now will cancel it."),
-        )
+        if self._is_uploading:
+            body = _("An upload is in progress. Closing now will cancel it.")
+        else:
+            body = _("A conversion is in progress. Closing now will cancel it.")
+
+        dialog = Adw.AlertDialog.new(_("Cancel operation?"), body)
         dialog.add_response("cancel", _("Keep waiting"))
         dialog.add_response("close", _("Close anyway"))
         dialog.set_response_appearance("close", Adw.ResponseAppearance.DESTRUCTIVE)

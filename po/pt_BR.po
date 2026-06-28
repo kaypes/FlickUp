@@ -2,123 +2,127 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-28 14:56-0300\n"
+"POT-Creation-Date: 2026-06-28 14:59-0300\n"
 "Language: pt_BR\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: src/window.py:66
+#: src/window.py:67
 msgid "Converting…"
 msgstr "Convertendo…"
 
-#: src/window.py:76 src/window.py:206
+#: src/window.py:79 src/window.py:209
 msgid "Convert"
 msgstr "Converter"
 
-#: src/window.py:113
+#: src/window.py:116
 msgid "Source"
 msgstr "Origem"
 
-#: src/window.py:116
+#: src/window.py:119
 msgid "Input File"
 msgstr "Arquivo de entrada"
 
-#: src/window.py:117
+#: src/window.py:120
 msgid "No file selected"
 msgstr "Nenhum arquivo selecionado"
 
-#: src/window.py:119 src/window.py:171
+#: src/window.py:122 src/window.py:174
 msgid "Browse"
 msgstr "Escolher"
 
-#: src/window.py:131
+#: src/window.py:134
 msgid "Output"
 msgstr "Saída"
 
-#: src/window.py:134
+#: src/window.py:137
 msgid "Output Filename"
 msgstr "Nome do arquivo de saída"
 
-#: src/window.py:138
+#: src/window.py:141
 msgid "Format"
 msgstr "Formato"
 
-#: src/window.py:153
+#: src/window.py:156
 msgid "Destination"
 msgstr "Destino"
 
-#: src/window.py:156
+#: src/window.py:159
 msgid "Send to Drive"
 msgstr "Enviar para o Drive"
 
-#: src/window.py:157
+#: src/window.py:160
 msgid "Upload to Drive after conversion"
 msgstr "Enviar para o Drive após a conversão"
 
-#: src/window.py:165
+#: src/window.py:168
 msgid "Local Destination"
 msgstr "Destino local"
 
-#: src/window.py:168
+#: src/window.py:171
 msgid "Output Folder"
 msgstr "Pasta de saída"
 
-#: src/window.py:183
+#: src/window.py:186
 msgid "Drive Destination"
 msgstr "Destino no Drive"
 
-#: src/window.py:185
+#: src/window.py:188
 msgid "Enter the destination folder name on your Google Drive"
 msgstr "Digite o nome da pasta de destino no seu Google Drive"
 
-#: src/window.py:190
+#: src/window.py:193
 msgid "Folder Name"
 msgstr "Nome da pasta"
 
-#: src/window.py:247
+#: src/window.py:250
 #, python-brace-format
 msgid "{names} is not installed. Please install it to use FlickUp."
 msgstr "{names} não está instalado. Instale para usar o FlickUp."
 
-#: src/window.py:259
+#: src/window.py:262
 msgid "Video files"
 msgstr "Arquivos de vídeo"
 
-#: src/window.py:263
+#: src/window.py:266
 msgid "All files"
 msgstr "Todos os arquivos"
 
-#: src/window.py:271
+#: src/window.py:274
 msgid "Select Input Video"
 msgstr "Selecionar vídeo de entrada"
 
-#: src/window.py:286
+#: src/window.py:289
 #, python-brace-format
 msgid "Error opening file: {msg}"
 msgstr "Erro ao abrir arquivo: {msg}"
 
-#: src/window.py:290
+#: src/window.py:293
 msgid "Select Output Folder"
 msgstr "Selecionar pasta de saída"
 
-#: src/window.py:303
+#: src/window.py:306
 #, python-brace-format
 msgid "Error selecting folder: {msg}"
 msgstr "Erro ao selecionar pasta: {msg}"
 
-#: src/window.py:318
-msgid "Cancel operation?"
-msgstr "Cancelar operação?"
+#: src/window.py:321
+msgid "An upload is in progress. Closing now will cancel it."
+msgstr "Um envio está em andamento. Fechar agora irá cancelá-lo."
 
-#: src/window.py:319
+#: src/window.py:323
 msgid "A conversion is in progress. Closing now will cancel it."
 msgstr "Uma conversão está em andamento. Fechar agora irá cancelá-la."
 
-#: src/window.py:321
+#: src/window.py:325
+msgid "Cancel operation?"
+msgstr "Cancelar operação?"
+
+#: src/window.py:326
 msgid "Keep waiting"
 msgstr "Continuar aguardando"
 
-#: src/window.py:322
+#: src/window.py:327
 msgid "Close anyway"
 msgstr "Fechar mesmo assim"
 
