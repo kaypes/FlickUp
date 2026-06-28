@@ -1,0 +1,108 @@
+# Portuguese (Brazil) translation for FlickUp.
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: pt_BR\n"
+
+msgid "Converting…"
+msgstr "Convertendo…"
+
+msgid "Convert"
+msgstr "Converter"
+
+msgid "Source"
+msgstr "Origem"
+
+msgid "Input File"
+msgstr "Arquivo de entrada"
+
+msgid "No file selected"
+msgstr "Nenhum arquivo selecionado"
+
+msgid "Browse"
+msgstr "Escolher"
+
+msgid "Output"
+msgstr "Saída"
+
+msgid "Output Filename"
+msgstr "Nome do arquivo de saída"
+
+msgid "Format"
+msgstr "Formato"
+
+msgid "Destination"
+msgstr "Destino"
+
+msgid "Send to Drive"
+msgstr "Enviar para o Drive"
+
+msgid "Upload via rclone after conversion"
+msgstr "Enviar pelo rclone após a conversão"
+
+msgid "Local Destination"
+msgstr "Destino local"
+
+msgid "Output Folder"
+msgstr "Pasta de saída"
+
+msgid "rclone Destination"
+msgstr "Destino rclone"
+
+msgid "Example: \"remote:MyFolder\""
+msgstr "Exemplo: \"remote:MinhaPasta\""
+
+msgid "rclone Path"
+msgstr "Caminho rclone"
+
+msgid "{names} is not installed. Please install it to use FlickUp."
+msgstr "{names} não está instalado. Instale para usar o FlickUp."
+
+msgid "Video files"
+msgstr "Arquivos de vídeo"
+
+msgid "All files"
+msgstr "Todos os arquivos"
+
+msgid "Select Input Video"
+msgstr "Selecionar vídeo de entrada"
+
+msgid "Error opening file: {msg}"
+msgstr "Erro ao abrir arquivo: {msg}"
+
+msgid "Select Output Folder"
+msgstr "Selecionar pasta de saída"
+
+msgid "Error selecting folder: {msg}"
+msgstr "Erro ao selecionar pasta: {msg}"
+
+msgid "Please select an input file."
+msgstr "Selecione um arquivo de entrada."
+
+msgid "Please enter an output filename."
+msgstr "Digite o nome do arquivo de saída."
+
+msgid "Please enter an rclone path (e.g. remote:folder)."
+msgstr "Digite o caminho rclone (ex: remote:pasta)."
+
+msgid "rclone path must include a remote name (e.g. remote:folder)."
+msgstr "O caminho rclone deve incluir o nome do remote (ex: remote:pasta)."
+
+msgid "Conversion complete!"
+msgstr "Conversão concluída!"
+
+msgid "Unknown error"
+msgstr "Erro desconhecido"
+
+msgid "Error: {msg}"
+msgstr "Erro: {msg}"
+
+msgid "ffmpeg failed with no output."
+msgstr "O ffmpeg falhou sem mensagem de erro."
+
+msgid "rclone is not installed."
+msgstr "O rclone não está instalado."
+
+msgid "rclone failed with no output."
+msgstr "O rclone falhou sem mensagem de erro."

@@ -1,10 +1,16 @@
+import gettext
 import sys
+from pathlib import Path
 
 import gi
 
 gi.require_version("Adw", "1")
 
 from gi.repository import Adw, Gio
+
+_LOCALE_DIR = Path(__file__).parent.parent / "locale"
+gettext.bindtextdomain("flickup", _LOCALE_DIR)
+gettext.textdomain("flickup")
 
 from .window import FlickUpWindow
 

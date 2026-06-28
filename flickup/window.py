@@ -1,3 +1,4 @@
+from gettext import gettext as _
 from pathlib import Path
 
 import gi
@@ -59,12 +60,12 @@ class FlickUpWindow(Adw.ApplicationWindow):
 
     def begin_processing(self) -> None:
         self._btn_spinner.set_visible(True)
-        self._btn_label.set_label("Converting…")
+        self._btn_label.set_label(_("Converting…"))
         self._set_ui_sensitive(False)
 
     def end_processing(self) -> None:
         self._btn_spinner.set_visible(False)
-        self._btn_label.set_label("Convert")
+        self._btn_label.set_label(_("Convert"))
         self._set_ui_sensitive(True)
 
     def show_toast(self, message: str, *, high: bool = False) -> None:
@@ -101,13 +102,13 @@ class FlickUpWindow(Adw.ApplicationWindow):
 
     def _build_input_group(self) -> None:
         group = Adw.PreferencesGroup()
-        group.set_title("Source")
+        group.set_title(_("Source"))
 
         self._row_input = Adw.ActionRow()
-        self._row_input.set_title("Input File")
-        self._row_input.set_subtitle("No file selected")
+        self._row_input.set_title(_("Input File"))
+        self._row_input.set_subtitle(_("No file selected"))
 
-        self._btn_browse_input = Gtk.Button(label="Browse")
+        self._btn_browse_input = Gtk.Button(label=_("Browse"))
         self._btn_browse_input.add_css_class("flat")
         self._btn_browse_input.set_valign(Gtk.Align.CENTER)
         self._btn_browse_input.connect("clicked", self._on_browse_input)
@@ -119,14 +120,14 @@ class FlickUpWindow(Adw.ApplicationWindow):
 
     def _build_output_group(self) -> None:
         group = Adw.PreferencesGroup()
-        group.set_title("Output")
+        group.set_title(_("Output"))
 
         self._row_output_name = Adw.EntryRow()
-        self._row_output_name.set_title("Output Filename")
+        self._row_output_name.set_title(_("Output Filename"))
         self._row_output_name.set_show_apply_button(False)
 
         self._row_format = Adw.ComboRow()
-        self._row_format.set_title("Format")
+        self._row_format.set_title(_("Format"))
         self._row_format.set_model(Gtk.StringList.new(self._formats))
 
         last_fmt = settings.get_last_format()
@@ -141,24 +142,24 @@ class FlickUpWindow(Adw.ApplicationWindow):
 
     def _build_destination_group(self) -> None:
         group = Adw.PreferencesGroup()
-        group.set_title("Destination")
+        group.set_title(_("Destination"))
 
         self._row_send_to_drive = Adw.SwitchRow()
-        self._row_send_to_drive.set_title("Send to Drive")
-        self._row_send_to_drive.set_subtitle("Upload via rclone after conversion")
+        self._row_send_to_drive.set_title(_("Send to Drive"))
+        self._row_send_to_drive.set_subtitle(_("Upload via rclone after conversion"))
 
         group.add(self._row_send_to_drive)
         self._page.add(group)
 
     def _build_local_group(self) -> None:
         self._group_local = Adw.PreferencesGroup()
-        self._group_local.set_title("Local Destination")
+        self._group_local.set_title(_("Local Destination"))
 
         self._row_local_folder = Adw.ActionRow()
-        self._row_local_folder.set_title("Output Folder")
+        self._row_local_folder.set_title(_("Output Folder"))
         self._row_local_folder.set_subtitle(self._local_folder)
 
-        self._btn_browse_folder = Gtk.Button(label="Browse")
+        self._btn_browse_folder = Gtk.Button(label=_("Browse"))
         self._btn_browse_folder.add_css_class("flat")
         self._btn_browse_folder.set_valign(Gtk.Align.CENTER)
         self._btn_browse_folder.connect("clicked", self._on_browse_folder)
@@ -170,12 +171,12 @@ class FlickUpWindow(Adw.ApplicationWindow):
 
     def _build_drive_group(self) -> None:
         self._group_drive = Adw.PreferencesGroup()
-        self._group_drive.set_title("rclone Destination")
-        self._group_drive.set_description('Example: "remote:MyFolder"')
+        self._group_drive.set_title(_("rclone Destination"))
+        self._group_drive.set_description(_('Example: "remote:MyFolder"'))
         self._group_drive.set_visible(False)
 
         self._row_rclone_path = Adw.EntryRow()
-        self._row_rclone_path.set_title("rclone Path")
+        self._row_rclone_path.set_title(_("rclone Path"))
         self._row_rclone_path.set_show_apply_button(False)
 
         self._group_drive.add(self._row_rclone_path)
@@ -191,7 +192,7 @@ class FlickUpWindow(Adw.ApplicationWindow):
         self._btn_spinner.set_visible(False)
         box.append(self._btn_spinner)
 
-        self._btn_label = Gtk.Label(label="Convert")
+        self._btn_label = Gtk.Label(label=_("Convert"))
         box.append(self._btn_label)
 
         btn = Gtk.Button()
@@ -232,7 +233,9 @@ class FlickUpWindow(Adw.ApplicationWindow):
         if missing:
             names = " and ".join(missing)
             self._banner.set_title(
-                f"{names} is not installed. Please install it to use FlickUp."
+                _("{names} is not installed. Please install it to use FlickUp.").format(
+                    names=names
+                )
             )
             self._banner.set_revealed(True)
         else:
@@ -242,11 +245,11 @@ class FlickUpWindow(Adw.ApplicationWindow):
 
     def _on_browse_input(self, _button) -> None:
         video_filter = Gtk.FileFilter()
-        video_filter.set_name("Video files")
+        video_filter.set_name(_("Video files"))
         video_filter.add_mime_type("video/*")
 
         all_filter = Gtk.FileFilter()
-        all_filter.set_name("All files")
+        all_filter.set_name(_("All files"))
         all_filter.add_pattern("*")
 
         filters = Gio.ListStore.new(Gtk.FileFilter)
@@ -254,7 +257,7 @@ class FlickUpWindow(Adw.ApplicationWindow):
         filters.append(all_filter)
 
         dialog = Gtk.FileDialog.new()
-        dialog.set_title("Select Input Video")
+        dialog.set_title(_("Select Input Video"))
         dialog.set_filters(filters)
         dialog.set_default_filter(video_filter)
         dialog.set_initial_folder(Gio.File.new_for_path(GLib.get_home_dir()))
@@ -269,11 +272,11 @@ class FlickUpWindow(Adw.ApplicationWindow):
                 self._row_output_name.set_text(Path(self._input_file).stem)
         except GLib.Error as e:
             if e.code not in (Gtk.DialogError.CANCELLED, Gtk.DialogError.DISMISSED):
-                self.show_toast(f"Error opening file: {e.message}")
+                self.show_toast(_("Error opening file: {msg}").format(msg=e.message))
 
     def _on_browse_folder(self, _button) -> None:
         dialog = Gtk.FileDialog.new()
-        dialog.set_title("Select Output Folder")
+        dialog.set_title(_("Select Output Folder"))
         dialog.set_initial_folder(Gio.File.new_for_path(GLib.get_home_dir()))
         dialog.select_folder(self, None, self._on_folder_chosen)
 
@@ -285,7 +288,9 @@ class FlickUpWindow(Adw.ApplicationWindow):
                 self._row_local_folder.set_subtitle(self._local_folder)
         except GLib.Error as e:
             if e.code not in (Gtk.DialogError.CANCELLED, Gtk.DialogError.DISMISSED):
-                self.show_toast(f"Error selecting folder: {e.message}")
+                self.show_toast(
+                    _("Error selecting folder: {msg}").format(msg=e.message)
+                )
 
     def _on_format_changed(self, *_) -> None:
         settings.save_last_format(self.selected_format)

@@ -2,6 +2,8 @@ import shutil
 import subprocess
 from dataclasses import dataclass
 
+from gettext import gettext as _
+
 from gi.repository import GLib
 
 
@@ -40,20 +42,20 @@ def run_conversion(job: ConversionJob, on_done) -> None:
     result = subprocess.run(ffmpeg_cmd, capture_output=True, text=True)
 
     if result.returncode != 0:
-        error = result.stderr or "ffmpeg falhou sem mensagem de erro."
+        error = result.stderr or _("ffmpeg failed with no output.")
         GLib.idle_add(on_done, False, error)
         return
 
     if job.send_to_drive:
         if not shutil.which("rclone"):
-            GLib.idle_add(on_done, False, "rclone não está instalado.")
+            GLib.idle_add(on_done, False, _("rclone is not installed."))
             return
 
         rclone_cmd = ["rclone", "copy", job.output_file, job.rclone_path]
         result = subprocess.run(rclone_cmd, capture_output=True, text=True)
 
         if result.returncode != 0:
-            error = result.stderr or "rclone falhou sem mensagem de erro."
+            error = result.stderr or _("rclone failed with no output.")
             GLib.idle_add(on_done, False, error)
             return
 

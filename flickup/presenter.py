@@ -1,5 +1,6 @@
 import tempfile
 import threading
+from gettext import gettext as _
 from pathlib import Path
 
 from .converter import ConversionJob, run_conversion
@@ -35,14 +36,14 @@ class FlickUpPresenter:
     def _validate(self) -> str | None:
         w = self._window
         if not w.input_file:
-            return "Please select an input file."
+            return _("Please select an input file.")
         if not w.output_name:
-            return "Please enter an output filename."
+            return _("Please enter an output filename.")
         if w.send_to_drive:
             if not w.rclone_path:
-                return "Please enter an rclone path (e.g. remote:folder)."
+                return _("Please enter an rclone path (e.g. remote:folder).")
             if ":" not in w.rclone_path:
-                return "rclone path must include a remote name (e.g. remote:folder)."
+                return _("rclone path must include a remote name (e.g. remote:folder).")
         return None
 
     def _build_job(self) -> ConversionJob:
@@ -65,8 +66,8 @@ class FlickUpPresenter:
         self._processing = False
         self._window.end_processing()
         if success:
-            self._window.show_toast("Conversion complete!")
+            self._window.show_toast(_("Conversion complete!"))
         else:
-            msg = (error or "Unknown error")[:200]
-            self._window.show_toast(f"Error: {msg}", high=True)
+            msg = (error or _("Unknown error"))[:200]
+            self._window.show_toast(_("Error: {msg}").format(msg=msg), high=True)
         return False
