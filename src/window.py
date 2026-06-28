@@ -21,6 +21,7 @@ class FlickUpWindow(Adw.ApplicationWindow):
         self._input_file: str | None = None
         self._local_folder: str = _videos or str(Path(GLib.get_home_dir()) / "Videos")
         self._formats = [".mov", ".mp4", ".mkv", ".avi"]
+        self._is_processing = False
         self._presenter = FlickUpPresenter(self)
 
         self.set_title("FlickUp")
@@ -29,6 +30,7 @@ class FlickUpWindow(Adw.ApplicationWindow):
         self._build_ui()
         self._setup_bindings()
         self._check_tools()
+        self.connect("close-request", self._on_close_request)
 
     # ── Form value properties (read by presenter) ─────────────────────────────
 
@@ -59,6 +61,7 @@ class FlickUpWindow(Adw.ApplicationWindow):
     # ── Public UI update methods (called by presenter) ────────────────────────
 
     def begin_processing(self) -> None:
+        self._is_processing = True
         self._btn_spinner.set_visible(True)
         self._btn_label.set_label(_("Converting…"))
         self._set_ui_sensitive(False)
@@ -68,6 +71,7 @@ class FlickUpWindow(Adw.ApplicationWindow):
         return False
 
     def end_processing(self) -> None:
+        self._is_processing = False
         self._btn_spinner.set_visible(False)
         self._btn_label.set_label(_("Convert"))
         self._set_ui_sensitive(True)
@@ -305,6 +309,27 @@ class FlickUpWindow(Adw.ApplicationWindow):
 
     def _on_format_changed(self, *_) -> None:
         settings.save_last_format(self.selected_format)
+
+    def _on_close_request(self, _window) -> bool:
+        if not self._is_processing:
+            return False
+
+        dialog = Adw.AlertDialog.new(
+            _("Cancel operation?"),
+            _("A conversion is in progress. Closing now will cancel it."),
+        )
+        dialog.add_response("cancel", _("Keep waiting"))
+        dialog.add_response("close", _("Close anyway"))
+        dialog.set_response_appearance("close", Adw.ResponseAppearance.DESTRUCTIVE)
+        dialog.set_default_response("cancel")
+        dialog.set_close_response("cancel")
+        dialog.connect("response", self._on_close_confirmed)
+        dialog.present(self)
+        return True
+
+    def _on_close_confirmed(self, _dialog, response: str) -> None:
+        if response == "close":
+            self.destroy()
 
     # ── Internal UI state helpers ─────────────────────────────────────────────
 
