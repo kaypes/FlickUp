@@ -25,7 +25,9 @@ def _get_credentials() -> Credentials:
         else:
             if not _CREDENTIALS.exists():
                 raise FileNotFoundError(
-                    _("credentials.json not found. Please set up Google Drive credentials.")
+                    _(
+                        "credentials.json not found. Please set up Google Drive credentials."
+                    )
                 )
             flow = InstalledAppFlow.from_client_secrets_file(str(_CREDENTIALS), _SCOPES)
             creds = flow.run_local_server(port=0)
