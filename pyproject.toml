@@ -9,7 +9,10 @@ dependencies = [
 ]
 
 [project.scripts]
-flickup = "flickup.app:main"
+flickup = "src.app:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
 
 [build-system]
 requires = ["hatchling"]
