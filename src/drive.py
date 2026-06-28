@@ -1,3 +1,4 @@
+import os
 from gettext import gettext as _
 from pathlib import Path
 
@@ -9,8 +10,13 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
 _SCOPES = ["https://www.googleapis.com/auth/drive.file"]
-_CREDENTIALS = Path(__file__).parent.parent / "credentials.json"
-_TOKEN = Path(GLib.get_user_config_dir()) / "flickup" / "token.json"
+
+_CREDENTIALS = Path(
+    os.environ.get("FLICKUP_CREDENTIALS", Path(__file__).parent.parent / "credentials.json")
+)
+_TOKEN = Path(
+    os.environ.get("FLICKUP_TOKEN", Path(GLib.get_user_config_dir()) / "flickup" / "token.json")
+)
 
 
 def _get_credentials() -> Credentials:
