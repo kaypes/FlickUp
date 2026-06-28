@@ -9,11 +9,11 @@ gi.require_version("Adw", "1")
 from gi.repository import Adw, GLib, GObject, Gio, Gtk
 
 from .converter import check_tools
-from .presenter import FlickUpPresenter
+from .presenter import Presenter
 from . import settings
 
 
-class FlickUpWindow(Adw.ApplicationWindow):
+class Window(Adw.ApplicationWindow):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -23,9 +23,9 @@ class FlickUpWindow(Adw.ApplicationWindow):
         self._formats = [".mov", ".mp4", ".mkv", ".avi"]
         self._is_processing = False
         self._is_uploading = False
-        self._presenter = FlickUpPresenter(self)
+        self._presenter = Presenter(self)
 
-        self.set_title("FlickUp")
+        self.set_title("noname")
         self.set_default_size(600, -1)
 
         self._build_ui()
@@ -247,7 +247,7 @@ class FlickUpWindow(Adw.ApplicationWindow):
         if missing:
             names = " and ".join(missing)
             self._banner.set_title(
-                _("{names} is not installed. Please install it to use FlickUp.").format(
+                _("{names} is not installed. Please install it to use noname.").format(
                     names=names
                 )
             )

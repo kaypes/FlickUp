@@ -12,14 +12,10 @@ from googleapiclient.http import MediaFileUpload
 _SCOPES = ["https://www.googleapis.com/auth/drive.file"]
 
 _CREDENTIALS = Path(
-    os.environ.get(
-        "FLICKUP_CREDENTIALS", Path(__file__).parent.parent / "credentials.json"
-    )
+    os.environ.get("CREDENTIALS", Path(__file__).parent.parent / "credentials.json")
 )
 _TOKEN = Path(
-    os.environ.get(
-        "FLICKUP_TOKEN", Path(GLib.get_user_config_dir()) / "flickup" / "token.json"
-    )
+    os.environ.get("TOKEN", Path(GLib.get_user_config_dir()) / "noname" / "token.json")
 )
 
 

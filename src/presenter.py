@@ -10,7 +10,7 @@ from . import drive
 from .converter import ConversionJob
 
 
-class FlickUpPresenter:
+class Presenter:
     def __init__(self, window) -> None:
         self._window = window
         self._processing = False
@@ -44,7 +44,7 @@ class FlickUpPresenter:
     def _build_job(self) -> ConversionJob:
         w = self._window
         if w.send_to_drive:
-            output_dir = tempfile.mkdtemp(prefix="flickup_")
+            output_dir = tempfile.mkdtemp(prefix="noname_")
         else:
             output_dir = w.local_folder
             Path(output_dir).mkdir(parents=True, exist_ok=True)

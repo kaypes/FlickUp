@@ -3,7 +3,7 @@ from pathlib import Path
 
 from gi.repository import GLib
 
-_CONFIG_FILE = Path(GLib.get_user_config_dir()) / "flickup" / "settings.json"
+_CONFIG_FILE = Path(GLib.get_user_config_dir()) / "noname" / "settings.json"
 _DEFAULTS: dict = {"last_format": ".mov", "send_to_drive": False}
 
 

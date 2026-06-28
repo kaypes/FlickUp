@@ -1,5 +1,5 @@
 [project]
-name = "flickup"
+name = "noname"
 version = "0.1.0"
 description = "GNOME video converter and Drive uploader"
 readme = "README.md"
@@ -13,7 +13,7 @@ dependencies = [
 ]
 
 [project.scripts]
-flickup = "src.app:main"
+noname = "src.app:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src"]
