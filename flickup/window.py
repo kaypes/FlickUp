@@ -194,32 +194,36 @@ class FlickUpWindow(Adw.ApplicationWindow):
         self._btn_label = Gtk.Label(label="Convert")
         box.append(self._btn_label)
 
-        self._btn_convert = Gtk.Button()
-        self._btn_convert.set_child(box)
-        self._btn_convert.add_css_class("suggested-action")
-        self._btn_convert.add_css_class("pill")
-        self._btn_convert.set_hexpand(True)
-        self._btn_convert.set_margin_top(8)
-        self._btn_convert.set_margin_bottom(8)
-        self._btn_convert.connect(
-            "clicked", lambda _: self._presenter.on_convert_clicked()
-        )
+        btn = Gtk.Button()
+        btn.set_child(box)
+        btn.add_css_class("suggested-action")
+        btn.add_css_class("pill")
+        btn.set_hexpand(True)
+        btn.set_margin_top(8)
+        btn.set_margin_bottom(8)
+        btn.connect("clicked", lambda _: self._presenter.on_convert_clicked())
 
-        group.add(self._btn_convert)
+        group.add(btn)
         self._page.add(group)
 
     # ── Bindings ──────────────────────────────────────────────────────────────
 
     def _setup_bindings(self) -> None:
         self._row_send_to_drive.bind_property(
-            "active", self._group_drive, "visible",
+            "active",
+            self._group_drive,
+            "visible",
             GObject.BindingFlags.SYNC_CREATE,
         )
         self._row_send_to_drive.bind_property(
-            "active", self._group_local, "visible",
+            "active",
+            self._group_local,
+            "visible",
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.INVERT_BOOLEAN,
         )
-        self._row_send_to_drive.connect("notify::active", lambda *_: self._check_tools())
+        self._row_send_to_drive.connect(
+            "notify::active", lambda *_: self._check_tools()
+        )
 
     # ── Tool availability warning ─────────────────────────────────────────────
 
