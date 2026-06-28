@@ -38,8 +38,8 @@ msgstr "Destino"
 msgid "Send to Drive"
 msgstr "Enviar para o Drive"
 
-msgid "Upload to Drive after conversion"
-msgstr "Enviar para o Drive após a conversão"
+msgid "Upload via rclone after conversion"
+msgstr "Enviar pelo rclone após a conversão"
 
 msgid "Local Destination"
 msgstr "Destino local"
@@ -47,14 +47,14 @@ msgstr "Destino local"
 msgid "Output Folder"
 msgstr "Pasta de saída"
 
-msgid "Drive Destination"
-msgstr "Destino no Drive"
+msgid "rclone Destination"
+msgstr "Destino rclone"
 
-msgid "Enter the destination folder name on your Google Drive"
-msgstr "Digite o nome da pasta de destino no seu Google Drive"
+msgid "Example: \"remote:MyFolder\""
+msgstr "Exemplo: \"remote:MinhaPasta\""
 
-msgid "Folder Name"
-msgstr "Nome da pasta"
+msgid "rclone Path"
+msgstr "Caminho rclone"
 
 msgid "{names} is not installed. Please install it to use FlickUp."
 msgstr "{names} não está instalado. Instale para usar o FlickUp."
@@ -83,8 +83,11 @@ msgstr "Selecione um arquivo de entrada."
 msgid "Please enter an output filename."
 msgstr "Digite o nome do arquivo de saída."
 
-msgid "Please enter a Drive folder name."
-msgstr "Digite o nome da pasta no Drive."
+msgid "Please enter an rclone path (e.g. remote:folder)."
+msgstr "Digite o caminho rclone (ex: remote:pasta)."
+
+msgid "rclone path must include a remote name (e.g. remote:folder)."
+msgstr "O caminho rclone deve incluir o nome do remote (ex: remote:pasta)."
 
 msgid "Conversion complete!"
 msgstr "Conversão concluída!"
@@ -98,5 +101,8 @@ msgstr "Erro: {msg}"
 msgid "ffmpeg failed with no output."
 msgstr "O ffmpeg falhou sem mensagem de erro."
 
-msgid "credentials.json not found. Please set up Google Drive credentials."
-msgstr "credentials.json não encontrado. Configure as credenciais do Google Drive."
+msgid "rclone is not installed."
+msgstr "O rclone não está instalado."
+
+msgid "rclone failed with no output."
+msgstr "O rclone falhou sem mensagem de erro."

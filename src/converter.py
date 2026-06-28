@@ -24,10 +24,14 @@ def check_tools() -> list[str]:
 def run_conversion(job: ConversionJob, on_done) -> None:
     ffmpeg_cmd = [
         "ffmpeg",
-        "-i", job.input_file,
-        "-map_metadata", "-1",
-        "-map_chapters", "-1",
-        "-c", "copy",
+        "-i",
+        job.input_file,
+        "-map_metadata",
+        "-1",
+        "-map_chapters",
+        "-1",
+        "-c",
+        "copy",
         job.output_file,
         "-y",
     ]
