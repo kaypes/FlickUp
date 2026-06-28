@@ -17,8 +17,8 @@ class FlickUpWindow(Adw.ApplicationWindow):
         super().__init__(**kwargs)
 
         self._input_file: str | None = None
-        _videos = Path(GLib.get_home_dir()) / "Videos"
-        self._local_folder: str = str(_videos)
+        _videos = GLib.get_user_special_dir(GLib.UserDirectory.DIRECTORY_VIDEOS)
+        self._local_folder: str = _videos or str(Path(GLib.get_home_dir()) / "Videos")
         self._formats = [".mov", ".mp4", ".mkv", ".avi"]
         self._pulse_source_id: int | None = None
 
