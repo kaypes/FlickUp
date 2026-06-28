@@ -1,9 +1,13 @@
+import subprocess
 import tempfile
 import threading
 from gettext import gettext as _
 from pathlib import Path
 
-from .converter import ConversionJob, run_conversion
+from gi.repository import GLib
+
+from . import drive
+from .converter import ConversionJob
 
 
 class FlickUpPresenter:
@@ -25,11 +29,7 @@ class FlickUpPresenter:
         job = self._build_job()
         self._processing = True
         self._window.begin_processing()
-        threading.Thread(
-            target=run_conversion,
-            args=(job, self._on_done),
-            daemon=True,
-        ).start()
+        threading.Thread(target=self._run, args=(job,), daemon=True).start()
 
     # ── Private ───────────────────────────────────────────────────────────────
 
@@ -39,11 +39,8 @@ class FlickUpPresenter:
             return _("Please select an input file.")
         if not w.output_name:
             return _("Please enter an output filename.")
-        if w.send_to_drive:
-            if not w.rclone_path:
-                return _("Please enter a Drive destination path.")
-            if ":" not in w.rclone_path:
-                return _("Drive destination path is invalid.")
+        if w.send_to_drive and not w.drive_folder:
+            return _("Please enter a Drive folder name.")
         return None
 
     def _build_job(self) -> ConversionJob:
@@ -59,8 +56,38 @@ class FlickUpPresenter:
             input_file=w.input_file,
             output_file=output_file,
             send_to_drive=w.send_to_drive,
-            rclone_path=w.rclone_path if w.send_to_drive else "",
+            drive_folder=w.drive_folder if w.send_to_drive else "",
         )
+
+    def _run(self, job: ConversionJob) -> None:
+        ffmpeg_cmd = [
+            "ffmpeg",
+            "-i",
+            job.input_file,
+            "-map_metadata",
+            "-1",
+            "-map_chapters",
+            "-1",
+            "-c",
+            "copy",
+            job.output_file,
+            "-y",
+        ]
+
+        result = subprocess.run(ffmpeg_cmd, capture_output=True, text=True)
+        if result.returncode != 0:
+            error = result.stderr or _("ffmpeg failed with no output.")
+            GLib.idle_add(self._on_done, False, error)
+            return
+
+        if job.send_to_drive:
+            try:
+                drive.upload_sync(job.output_file, job.drive_folder)
+            except Exception as e:
+                GLib.idle_add(self._on_done, False, str(e))
+                return
+
+        GLib.idle_add(self._on_done, True, None)
 
     def _on_done(self, success: bool, error: str | None) -> bool:
         self._processing = False

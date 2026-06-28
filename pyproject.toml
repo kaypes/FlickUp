@@ -5,6 +5,9 @@ description = "GNOME video converter and Drive uploader"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "google-api-python-client>=2.198.0",
+    "google-auth-httplib2>=0.4.0",
+    "google-auth-oauthlib>=1.4.0",
     "pygobject>=3.56.3",
 ]
 
@@ -13,6 +16,11 @@ flickup = "src.app:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src"]
+
+[tool.ruff.lint.per-file-ignores]
+# gi.require_version() and gettext setup must precede their respective imports
+"src/app.py" = ["E402"]
+"src/window.py" = ["E402"]
 
 [build-system]
 requires = ["hatchling"]

@@ -53,8 +53,8 @@ class FlickUpWindow(Adw.ApplicationWindow):
         return self._local_folder
 
     @property
-    def rclone_path(self) -> str:
-        return self._row_rclone_path.get_text().strip()
+    def drive_folder(self) -> str:
+        return self._row_drive_folder.get_text().strip()
 
     # ── Public UI update methods (called by presenter) ────────────────────────
 
@@ -173,13 +173,16 @@ class FlickUpWindow(Adw.ApplicationWindow):
     def _build_drive_group(self) -> None:
         self._group_drive = Adw.PreferencesGroup()
         self._group_drive.set_title(_("Drive Destination"))
+        self._group_drive.set_description(
+            _("Enter the destination folder name on your Google Drive")
+        )
         self._group_drive.set_visible(False)
 
-        self._row_rclone_path = Adw.EntryRow()
-        self._row_rclone_path.set_title(_("Destination Path"))
-        self._row_rclone_path.set_show_apply_button(False)
+        self._row_drive_folder = Adw.EntryRow()
+        self._row_drive_folder.set_title(_("Folder Name"))
+        self._row_drive_folder.set_show_apply_button(False)
 
-        self._group_drive.add(self._row_rclone_path)
+        self._group_drive.add(self._row_drive_folder)
         self._page.add(self._group_drive)
 
     def _build_action_group(self) -> None:
@@ -229,7 +232,7 @@ class FlickUpWindow(Adw.ApplicationWindow):
     # ── Tool availability warning ─────────────────────────────────────────────
 
     def _check_tools(self) -> None:
-        missing = check_tools(self._row_send_to_drive.get_active())
+        missing = check_tools()
         if missing:
             names = " and ".join(missing)
             self._banner.set_title(
@@ -307,4 +310,4 @@ class FlickUpWindow(Adw.ApplicationWindow):
         self._row_output_name.set_sensitive(sensitive)
         self._row_format.set_sensitive(sensitive)
         self._row_send_to_drive.set_sensitive(sensitive)
-        self._row_rclone_path.set_sensitive(sensitive)
+        self._row_drive_folder.set_sensitive(sensitive)
