@@ -20,7 +20,6 @@ class FlickUpWindow(Adw.ApplicationWindow):
         self._input_file: str | None = None
         self._local_folder: str = _videos or str(Path(GLib.get_home_dir()) / "Videos")
         self._formats = [".mov", ".mp4", ".mkv", ".avi"]
-        self._pulse_source_id: int | None = None
         self._presenter = FlickUpPresenter(self)
 
         self.set_title("FlickUp")
@@ -59,20 +58,14 @@ class FlickUpWindow(Adw.ApplicationWindow):
     # ── Public UI update methods (called by presenter) ────────────────────────
 
     def begin_processing(self) -> None:
-        self._group_progress.set_visible(True)
+        self._btn_spinner.set_visible(True)
+        self._btn_label.set_label("Converting…")
         self._set_ui_sensitive(False)
-        self._pulse_source_id = GLib.timeout_add(80, self._pulse)
 
     def end_processing(self) -> None:
-        if self._pulse_source_id is not None:
-            GLib.source_remove(self._pulse_source_id)
-            self._pulse_source_id = None
-        self._progress_bar.set_text("Converting…")
-        self._group_progress.set_visible(False)
+        self._btn_spinner.set_visible(False)
+        self._btn_label.set_label("Convert")
         self._set_ui_sensitive(True)
-
-    def set_progress_text(self, text: str) -> None:
-        self._progress_bar.set_text(text)
 
     def show_toast(self, message: str, *, high: bool = False) -> None:
         toast = Adw.Toast.new(message)
@@ -105,7 +98,6 @@ class FlickUpWindow(Adw.ApplicationWindow):
         self._build_local_group()
         self._build_drive_group()
         self._build_action_group()
-        self._build_progress_group()
 
     def _build_input_group(self) -> None:
         group = Adw.PreferencesGroup()
@@ -192,7 +184,18 @@ class FlickUpWindow(Adw.ApplicationWindow):
     def _build_action_group(self) -> None:
         group = Adw.PreferencesGroup()
 
-        self._btn_convert = Gtk.Button(label="Convert")
+        box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
+        box.set_halign(Gtk.Align.CENTER)
+
+        self._btn_spinner = Adw.Spinner()
+        self._btn_spinner.set_visible(False)
+        box.append(self._btn_spinner)
+
+        self._btn_label = Gtk.Label(label="Convert")
+        box.append(self._btn_label)
+
+        self._btn_convert = Gtk.Button()
+        self._btn_convert.set_child(box)
         self._btn_convert.add_css_class("suggested-action")
         self._btn_convert.add_css_class("pill")
         self._btn_convert.set_hexpand(True)
@@ -205,38 +208,18 @@ class FlickUpWindow(Adw.ApplicationWindow):
         group.add(self._btn_convert)
         self._page.add(group)
 
-    def _build_progress_group(self) -> None:
-        self._group_progress = Adw.PreferencesGroup()
-        self._group_progress.set_visible(False)
-
-        self._progress_bar = Gtk.ProgressBar()
-        self._progress_bar.set_pulse_step(0.1)
-        self._progress_bar.set_text("Converting…")
-        self._progress_bar.set_show_text(True)
-        self._progress_bar.set_margin_top(4)
-        self._progress_bar.set_margin_bottom(4)
-
-        self._group_progress.add(self._progress_bar)
-        self._page.add(self._group_progress)
-
     # ── Bindings ──────────────────────────────────────────────────────────────
 
     def _setup_bindings(self) -> None:
         self._row_send_to_drive.bind_property(
-            "active",
-            self._group_drive,
-            "visible",
+            "active", self._group_drive, "visible",
             GObject.BindingFlags.SYNC_CREATE,
         )
         self._row_send_to_drive.bind_property(
-            "active",
-            self._group_local,
-            "visible",
+            "active", self._group_local, "visible",
             GObject.BindingFlags.SYNC_CREATE | GObject.BindingFlags.INVERT_BOOLEAN,
         )
-        self._row_send_to_drive.connect(
-            "notify::active", lambda *_: self._check_tools()
-        )
+        self._row_send_to_drive.connect("notify::active", lambda *_: self._check_tools())
 
     # ── Tool availability warning ─────────────────────────────────────────────
 
@@ -306,14 +289,9 @@ class FlickUpWindow(Adw.ApplicationWindow):
     # ── Internal UI state helpers ─────────────────────────────────────────────
 
     def _set_ui_sensitive(self, sensitive: bool) -> None:
-        self._btn_convert.set_sensitive(sensitive)
         self._btn_browse_input.set_sensitive(sensitive)
         self._btn_browse_folder.set_sensitive(sensitive)
         self._row_output_name.set_sensitive(sensitive)
         self._row_format.set_sensitive(sensitive)
         self._row_send_to_drive.set_sensitive(sensitive)
         self._row_rclone_path.set_sensitive(sensitive)
-
-    def _pulse(self) -> bool:
-        self._progress_bar.pulse()
-        return GLib.SOURCE_CONTINUE

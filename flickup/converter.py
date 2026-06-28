@@ -22,7 +22,7 @@ def check_tools(send_to_drive: bool) -> list[str]:
     return missing
 
 
-def run_conversion(job: ConversionJob, on_progress, on_done) -> None:
+def run_conversion(job: ConversionJob, on_done) -> None:
     ffmpeg_cmd = [
         "ffmpeg",
         "-i",
@@ -43,8 +43,6 @@ def run_conversion(job: ConversionJob, on_progress, on_done) -> None:
         error = result.stderr or "ffmpeg falhou sem mensagem de erro."
         GLib.idle_add(on_done, False, error)
         return
-
-    GLib.idle_add(on_progress)
 
     if job.send_to_drive:
         if not shutil.which("rclone"):

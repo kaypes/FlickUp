@@ -8,20 +8,25 @@ from .converter import ConversionJob, run_conversion
 class FlickUpPresenter:
     def __init__(self, window) -> None:
         self._window = window
+        self._processing = False
 
     # ── Public ────────────────────────────────────────────────────────────────
 
     def on_convert_clicked(self) -> None:
+        if self._processing:
+            return
+
         error = self._validate()
         if error:
             self._window.show_toast(error)
             return
 
         job = self._build_job()
+        self._processing = True
         self._window.begin_processing()
         threading.Thread(
             target=run_conversion,
-            args=(job, self._on_progress, self._on_done),
+            args=(job, self._on_done),
             daemon=True,
         ).start()
 
@@ -56,13 +61,8 @@ class FlickUpPresenter:
             rclone_path=w.rclone_path if w.send_to_drive else "",
         )
 
-    # Callbacks are dispatched to the main thread by GLib.idle_add in converter.py
-
-    def _on_progress(self) -> bool:
-        self._window.set_progress_text("Uploading to Drive…")
-        return False
-
     def _on_done(self, success: bool, error: str | None) -> bool:
+        self._processing = False
         self._window.end_processing()
         if success:
             self._window.show_toast("Conversion complete!")
