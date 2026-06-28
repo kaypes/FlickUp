@@ -1,7 +1,14 @@
 [project]
 name = "flickup"
 version = "0.1.0"
-description = "Add your description here"
+description = "GNOME video converter and Drive uploader"
 readme = "README.md"
-requires-python = ">=3.14"
+requires-python = ">=3.11"
 dependencies = []
+
+[project.scripts]
+flickup = "flickup.app:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
