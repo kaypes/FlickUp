@@ -1,9 +1,9 @@
-import subprocess
 import tempfile
 import threading
 from gettext import gettext as _
 from pathlib import Path
 
+import ffmpeg
 from gi.repository import GLib
 
 from . import drive
@@ -58,23 +58,22 @@ class Presenter:
         )
 
     def _run(self, job: ConversionJob) -> None:
-        ffmpeg_cmd = [
-            "ffmpeg",
-            "-i",
-            job.input_file,
-            "-map_metadata",
-            "-1",
-            "-map_chapters",
-            "-1",
-            "-c",
-            "copy",
-            job.output_file,
-            "-y",
-        ]
-
-        result = subprocess.run(ffmpeg_cmd, capture_output=True, text=True)
-        if result.returncode != 0:
-            error = result.stderr or _("ffmpeg failed with no output.")
+        try:
+            (
+                ffmpeg.input(job.input_file)
+                .output(
+                    job.output_file,
+                    map_metadata=-1,
+                    map_chapters=-1,
+                    c="copy",
+                )
+                .overwrite_output()
+                .run(capture_stdout=True, capture_stderr=True)
+            )
+        except ffmpeg.Error as e:
+            error = (
+                e.stderr.decode() if e.stderr else _("ffmpeg failed with no output.")
+            )
             GLib.idle_add(self._on_done, False, error)
             return
 
