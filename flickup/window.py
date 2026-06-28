@@ -19,6 +19,7 @@ class FlickUpWindow(Adw.ApplicationWindow):
         self._input_file: str | None = None
         self._local_folder: str | None = None
         self._formats = [".mov", ".mp4", ".mkv", ".avi"]
+        self._pulse_source_id: int | None = None
 
         self.set_title("FlickUp")
         self.set_default_size(600, -1)
@@ -57,6 +58,7 @@ class FlickUpWindow(Adw.ApplicationWindow):
         self._build_local_group()
         self._build_drive_group()
         self._build_action_group()
+        self._build_progress_group()
 
     def _build_input_group(self) -> None:
         group = Adw.PreferencesGroup()
@@ -153,6 +155,20 @@ class FlickUpWindow(Adw.ApplicationWindow):
         row.set_activatable_widget(self._btn_convert)
         group.add(row)
         self._page.add(group)
+
+    def _build_progress_group(self) -> None:
+        self._group_progress = Adw.PreferencesGroup()
+        self._group_progress.set_visible(False)
+
+        self._progress_bar = Gtk.ProgressBar()
+        self._progress_bar.set_pulse_step(0.1)
+        self._progress_bar.set_text("Converting…")
+        self._progress_bar.set_show_text(True)
+        self._progress_bar.set_margin_top(4)
+        self._progress_bar.set_margin_bottom(4)
+
+        self._group_progress.add(self._progress_bar)
+        self._page.add(self._group_progress)
 
     # ── Bindings ─────────────────────────────────────────────────────────────
 
@@ -289,6 +305,7 @@ class FlickUpWindow(Adw.ApplicationWindow):
 
     def _set_processing(self, processing: bool) -> None:
         self._spinner.set_visible(processing)
+        self._group_progress.set_visible(processing)
         self._btn_convert.set_sensitive(not processing)
         self._btn_browse_input.set_sensitive(not processing)
         self._btn_browse_folder.set_sensitive(not processing)
@@ -297,10 +314,22 @@ class FlickUpWindow(Adw.ApplicationWindow):
         self._row_send_to_drive.set_sensitive(not processing)
         self._row_rclone_path.set_sensitive(not processing)
 
+        if processing:
+            self._pulse_source_id = GLib.timeout_add(80, self._pulse)
+        elif self._pulse_source_id is not None:
+            GLib.source_remove(self._pulse_source_id)
+            self._pulse_source_id = None
+
+    def _pulse(self) -> bool:
+        self._progress_bar.pulse()
+        return GLib.SOURCE_CONTINUE
+
     def _on_progress(self) -> bool:
+        self._progress_bar.set_text("Uploading to Drive…")
         return GLib.SOURCE_REMOVE
 
     def _on_done(self, success: bool, error: str | None) -> bool:
+        self._progress_bar.set_text("Converting…")
         self._set_processing(False)
         if success:
             self._show_toast("Conversion complete!")
