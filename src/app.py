@@ -13,8 +13,8 @@ gi.require_version("Adw", "1")
 from gi.repository import Adw, Gio
 
 _LOCALE_DIR = Path(__file__).parent.parent / "locale"
-gettext.bindtextdomain("noname", _LOCALE_DIR)
-gettext.textdomain("noname")
+gettext.bindtextdomain("cika", _LOCALE_DIR)
+gettext.textdomain("cika")
 
 from .window import Window
 
@@ -22,7 +22,7 @@ from .window import Window
 class Application(Adw.Application):
     def __init__(self) -> None:
         super().__init__(
-            application_id="io.github.noname.Noname",
+            application_id="io.github.kaypes.Cika",
             flags=Gio.ApplicationFlags.DEFAULT_FLAGS,
         )
         self.connect("activate", self._on_activate)

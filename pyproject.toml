@@ -1,5 +1,5 @@
 [project]
-name = "noname"
+name = "cika"
 version = "0.1.0"
 description = "GNOME video converter and Drive uploader"
 readme = "README.md"
@@ -11,10 +11,11 @@ dependencies = [
     "google-auth-oauthlib>=1.4.0",
     "pygobject>=3.56.3",
     "python-dotenv>=1.2.2",
+    "textual>=8.2.8",
 ]
 
 [project.scripts]
-noname = "src.app:main"
+cika = "src.app:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src"]

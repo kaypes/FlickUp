@@ -25,7 +25,7 @@ class Window(Adw.ApplicationWindow):
         self._is_uploading = False
         self._presenter = Presenter(self)
 
-        self.set_title("noname")
+        self.set_title("CIKA")
         self.set_default_size(600, -1)
 
         self._build_ui()
@@ -247,7 +247,7 @@ class Window(Adw.ApplicationWindow):
         if missing:
             names = " and ".join(missing)
             self._banner.set_title(
-                _("{names} is not installed. Please install it to use noname.").format(
+                _("{names} is not installed. Please install it to use CIKA.").format(
                     names=names
                 )
             )

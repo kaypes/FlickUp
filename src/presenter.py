@@ -44,7 +44,7 @@ class Presenter:
     def _build_job(self) -> ConversionJob:
         w = self._window
         if w.send_to_drive:
-            output_dir = tempfile.mkdtemp(prefix="noname_")
+            output_dir = tempfile.mkdtemp(prefix="cika_")
         else:
             output_dir = w.local_folder
             Path(output_dir).mkdir(parents=True, exist_ok=True)

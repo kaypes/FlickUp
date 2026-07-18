@@ -1,4 +1,4 @@
-# Portuguese (Brazil) translation for noname.
+# Portuguese (Brazil) translation for cika.
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
@@ -77,8 +77,8 @@ msgstr "Nome da pasta"
 
 #: src/window.py:250
 #, python-brace-format
-msgid "{names} is not installed. Please install it to use noname."
-msgstr "{names} não está instalado. Instale para usar o noname."
+msgid "{names} is not installed. Please install it to use CIKA."
+msgstr "{names} não está instalado. Instale para usar o CIKA."
 
 #: src/window.py:262
 msgid "Video files"

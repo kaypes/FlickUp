@@ -16,7 +16,7 @@ _CREDENTIALS = Path(
     os.environ.get("CREDENTIALS", Path(__file__).parent.parent / "credentials.json")
 )
 _TOKEN = Path(
-    os.environ.get("TOKEN", Path(GLib.get_user_config_dir()) / "noname" / "token.json")
+    os.environ.get("TOKEN", Path(GLib.get_user_config_dir()) / "cika" / "token.json")
 )
 
 
